@@ -501,7 +501,22 @@ describe('Feedback API (Phase 2)', () => {
     assert.doesNotMatch(JSON.stringify(res.data), /mongodb:\/\/|apiKey|sk-/i);
   });
 
-  it('allows CORS requests from deployed Vercel frontend origin', async () => {
+  it('allows CORS GET requests from deployed Vercel frontend origin', async () => {
+    const res = await jsonRequest(
+      baseUrl,
+      'GET',
+      '/api/config',
+      undefined,
+      {
+        Origin: 'https://dulamobiles.vercel.app',
+      }
+    );
+
+    assert.equal(res.status, 200);
+    assert.equal(res.headers['access-control-allow-origin'], 'https://dulamobiles.vercel.app');
+  });
+
+  it('allows CORS POST requests from deployed Vercel frontend origin', async () => {
     const res = await jsonRequest(
       baseUrl,
       'POST',
@@ -519,7 +534,24 @@ describe('Feedback API (Phase 2)', () => {
     assert.equal(res.headers['access-control-allow-origin'], 'https://dulamobiles.vercel.app');
   });
 
-  it('allows CORS preflight OPTIONS from deployed Vercel frontend origin', async () => {
+  it('allows CORS preflight OPTIONS /api/config from deployed Vercel frontend origin', async () => {
+    const res = await jsonRequest(
+      baseUrl,
+      'OPTIONS',
+      '/api/config',
+      undefined,
+      {
+        Origin: 'https://dulamobiles.vercel.app',
+        'Access-Control-Request-Method': 'GET',
+      }
+    );
+
+    assert.equal(res.status, 204);
+    assert.equal(res.headers['access-control-allow-origin'], 'https://dulamobiles.vercel.app');
+    assert.match(res.headers['access-control-allow-methods'], /GET/);
+  });
+
+  it('allows CORS preflight OPTIONS /api/feedback from deployed Vercel frontend origin', async () => {
     const res = await jsonRequest(
       baseUrl,
       'OPTIONS',
@@ -533,9 +565,10 @@ describe('Feedback API (Phase 2)', () => {
 
     assert.equal(res.status, 204);
     assert.equal(res.headers['access-control-allow-origin'], 'https://dulamobiles.vercel.app');
+    assert.match(res.headers['access-control-allow-methods'], /POST/);
   });
 
-  it('allows CORS requests from Vercel preview deployments', async () => {
+  it('allows CORS GET requests from Vercel preview deployments', async () => {
     const res = await jsonRequest(
       baseUrl,
       'GET',
@@ -553,7 +586,57 @@ describe('Feedback API (Phase 2)', () => {
     );
   });
 
-  it('rejects CORS requests from untrusted origins with 403', async () => {
+  it('allows CORS preflight OPTIONS from Vercel preview deployments', async () => {
+    const res = await jsonRequest(
+      baseUrl,
+      'OPTIONS',
+      '/api/feedback',
+      undefined,
+      {
+        Origin: 'https://dulamobiles-preview-456.vercel.app',
+        'Access-Control-Request-Method': 'POST',
+      }
+    );
+
+    assert.equal(res.status, 204);
+    assert.equal(
+      res.headers['access-control-allow-origin'],
+      'https://dulamobiles-preview-456.vercel.app'
+    );
+  });
+
+  it('rejects CORS GET requests from untrusted origins with 403', async () => {
+    const res = await jsonRequest(
+      baseUrl,
+      'GET',
+      '/api/config',
+      undefined,
+      {
+        Origin: 'https://unauthorized-phishing-site.com',
+      }
+    );
+
+    assert.equal(res.status, 403);
+    assert.match(res.data.message, /CORS/i);
+  });
+
+  it('rejects CORS OPTIONS preflight from untrusted origins with 403', async () => {
+    const res = await jsonRequest(
+      baseUrl,
+      'OPTIONS',
+      '/api/feedback',
+      undefined,
+      {
+        Origin: 'https://unauthorized-phishing-site.com',
+        'Access-Control-Request-Method': 'POST',
+      }
+    );
+
+    assert.equal(res.status, 403);
+    assert.match(res.data.message, /CORS/i);
+  });
+
+  it('rejects CORS POST requests from untrusted origins with 403', async () => {
     const res = await jsonRequest(
       baseUrl,
       'POST',

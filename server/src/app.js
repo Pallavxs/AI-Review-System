@@ -58,7 +58,9 @@ app.use(
 
       return callback(new Error(`CORS: origin ${origin} not allowed`));
     },
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'OPTIONS', 'HEAD'],
+    optionsSuccessStatus: 204,
+    maxAge: 86400,
     credentials: true,
   })
 );
