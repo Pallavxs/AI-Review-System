@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Smart AI Google Review Builder</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Standee QR Code Modal -->
+    <div id="qrModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="qrModalTitle">Counter Standee QR Code</h3>
+          <button id="closeQrModalBtn" class="modal-close-btn" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Scan with your smartphone camera to launch the Smart AI Review Builder:</p>
+          <div class="qr-container">
+            <div id="qrCodeGraphic" class="qr-graphic"></div>
+          </div>
+          <div class="qr-url-box">
+            <span id="qrUrlText" class="qr-url-text"></span>
+            <button id="copyQrUrlBtn" class="copy-url-btn" title="Copy URL">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+              </svg>
+              <span id="copyQrBtnText">Copy Link</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Review Builder Container -->
+    <main class="review-card">
+      <!-- Business Header -->
+      <header class="business-header">
+        <div class="business-brand">
+          <div id="businessAvatar" class="business-avatar" aria-hidden="true">
+            <span id="businessAvatarText">D</span>
+          </div>
+          <div class="business-meta">
+            <div class="badge-row">
+              <span class="google-badge">
+                <svg class="google-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Google Reviews
+              </span>
+              <button id="openQrModalBtn" class="standee-pill-btn" title="View Standee QR Code">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                  <path d="M4 4h6v6H4V4zm2 2v2h2V6H6zm8-2h6v6h-6V4zm2 2v2h2V6h-2zM4 14h6v6H4v-6zm2 2v2h2v-2H6zm10 0h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 2h2v2h-2v-2zm2-4h2v2h-2v-2z"/>
+                </svg>
+                Standee QR
+              </button>
+            </div>
+            <div class="business-title-row">
+              <h1 id="businessNameDisplay" class="business-name">Dula mobiles</h1>
+              <span id="businessLocationBadge" class="business-location-badge hidden">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <span id="businessLocationText">Anuppur, MP</span>
+              </span>
+            </div>
+            <p class="business-subtitle">Share your honest feedback to help us serve you better!</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Feedback Form Step -->
+      <section id="feedbackFormSection" class="section-container">
+        <!-- Step 1: Star Rating -->
+        <div class="form-group">
+          <label class="form-label" id="ratingLabel">
+            <span class="step-num">1</span>
+            How would you rate your overall experience?
+          </label>
+          <div class="star-rating-widget" role="radiogroup" aria-labelledby="ratingLabel">
+            <button type="button" class="star-btn" data-rating="1" aria-label="1 star - Poor" title="1 star">★</button>
+            <button type="button" class="star-btn" data-rating="2" aria-label="2 stars - Fair" title="2 stars">★</button>
+            <button type="button" class="star-btn" data-rating="3" aria-label="3 stars - Good" title="3 stars">★</button>
+            <button type="button" class="star-btn" data-rating="4" aria-label="4 stars - Very Good" title="4 stars">★</button>
+            <button type="button" class="star-btn" data-rating="5" aria-label="5 stars - Excellent" title="5 stars">★</button>
+          </div>
+          <div id="ratingSentimentText" class="rating-sentiment" aria-live="polite">Tap a star to rate</div>
+        </div>
+
+        <!-- Step 2: Questionnaire Attributes Categorized -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="step-num">2</span>
+            What was your experience? <span class="label-hint">(Select all that apply)</span>
+          </label>
+          <div id="optionsContainer" class="categories-container">
+            <!-- Dynamically populated from /api/config with Mobile Phones, Accessories, Repairing -->
+          </div>
+        </div>
+
+        <!-- Step 3: Optional Comment -->
+        <div class="form-group">
+          <div class="label-with-counter">
+            <label for="commentInput" class="form-label">
+              <span class="step-num">3</span>
+              Personal details or highlights <span class="label-hint">(Optional)</span>
+            </label>
+            <span id="charCounter" class="char-counter">0 / 1000</span>
+          </div>
+          <textarea
+            id="commentInput"
+            class="comment-textarea"
+            maxlength="1000"
+            rows="3"
+            placeholder="Mention favorite items, helpful staff members, or specifics..."
+          ></textarea>
+        </div>
+
+        <!-- Generation Trigger Button -->
+        <div class="action-group">
+          <button id="generateBtn" class="btn-primary" disabled>
+            <span class="btn-icon">✨</span>
+            <span class="btn-text">Build Review with AI</span>
+          </button>
+          
+          <!-- Direct Google Link (Policy Compliance: Never restrict or gate access) -->
+          <div class="direct-google-row">
+            <a id="directGoogleLink" href="#" target="_blank" rel="noopener noreferrer" class="direct-google-link">
+              Or write your review directly on Google ↗
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Generating / Loading State -->
+      <section id="loadingSection" class="section-container loading-section hidden" aria-live="assertive">
+        <div class="loading-spinner"></div>
+        <h3 class="loading-title">Crafting your review with Google AI...</h3>
+        <p class="loading-desc">Personalizing your feedback into a natural, professional Google review draft.</p>
+      </section>
+
+      <!-- Generated Review Result Card -->
+      <section id="resultSection" class="section-container result-section hidden">
+        <div class="result-header">
+          <div class="result-badge">
+            <span class="sparkle-icon">✨</span> AI Review Draft Ready
+          </div>
+        </div>
+
+        <p class="result-hint">Feel free to edit or personalize the draft below before sharing on Google:</p>
+
+        <div class="draft-container">
+          <textarea
+            id="generatedReviewTextarea"
+            class="generated-textarea"
+            rows="5"
+            aria-label="Editable generated review draft"
+          ></textarea>
+          <div class="draft-meta">
+            <span id="draftWordCount" class="draft-word-count">0 words</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="result-actions">
+          <button id="copyReviewBtn" class="btn-secondary">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+            </svg>
+            <span id="copyBtnText">Copy Review</span>
+          </button>
+
+          <button id="regenerateBtn" class="btn-secondary" title="Generate another review draft">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+            <span>Regenerate</span>
+          </button>
+        </div>
+
+        <!-- Primary CTA to Google Review -->
+        <div class="google-cta-box">
+          <a id="postToGoogleBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-google">
+            <svg class="google-icon-btn" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span id="postToGoogleBtnText">Post a Review on Google</span>
+          </a>
+
+          <!-- Mobile-Friendly Success Message Banner -->
+          <div id="googleTransitionBanner" class="transition-banner hidden" role="status" aria-live="polite">
+            <div class="transition-header">
+              <span class="transition-check">✓</span>
+              <strong class="transition-title">Review Copied to Clipboard</strong>
+            </div>
+            <p id="transitionMessageText" class="transition-desc">
+              Your review has been copied. On Google, select your star rating, paste your review, and submit it.
+            </p>
+            <div class="transition-steps-mini">
+              <span>1. ⭐ Select Star Rating</span>
+              <span aria-hidden="true">•</span>
+              <span>2. 📋 Paste Copied Review</span>
+              <span aria-hidden="true">•</span>
+              <span>3. 🚀 Tap Post / Submit</span>
+            </div>
+          </div>
+
+          <!-- Fallback Alert if auto-copy fails -->
+          <div id="clipboardFallbackBanner" class="fallback-banner hidden" role="alert">
+            <div class="fallback-badge">
+              <span>⚠️</span>
+              <strong>Manual Copy Needed</strong>
+            </div>
+            <p class="fallback-desc">
+              Could not automatically copy to clipboard. We selected your review text above — please tap <strong>Copy Review</strong>, then paste and submit on Google.
+            </p>
+          </div>
+        </div>
+
+        <button id="editInputsBtn" class="edit-inputs-btn">
+          ← Modify rating or options
+        </button>
+      </section>
+
+      <!-- Error / Degraded Alert Banner -->
+      <div id="errorBanner" class="error-banner hidden" role="alert">
+        <span class="error-icon">⚠️</span>
+        <div class="error-content">
+          <p id="errorMessage" class="error-text">An error occurred.</p>
+        </div>
+        <button id="closeErrorBtn" class="error-close" aria-label="Dismiss">&times;</button>
+      </div>
+
+      <!-- Footer Policy Note -->
+      <footer class="card-footer">
+        <p class="policy-note">
+          Google Review Policy Compliant • Reviews are submitted by customers directly to Google • No artificial reviews.
+        </p>
+      </footer>
+    </main>
+
+    <!-- Floating Toast Notification -->
+    <div id="toastNotification" class="toast hidden" role="status" aria-live="polite">
+      <span id="toastIcon" class="toast-icon">✓</span>
+      <span id="toastMessage" class="toast-message">Copied to clipboard!</span>
+    </div>
+  </div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
