@@ -131,39 +131,37 @@ function enableInMemoryStore(Feedback) {
   };
 }
 
-export async function jsonRequest(baseUrl, method, path, body) {
+export async function jsonRequest(baseUrl, method, path, body, customHeaders = {}) {
   return new Promise((resolve, reject) => {
     const bodyStr = body !== undefined ? JSON.stringify(body) : undefined;
     const isPipe = typeof baseUrl === 'string' && baseUrl.startsWith('\\\\.\\pipe\\');
+
+    const headers = {
+      ...(bodyStr !== undefined
+        ? {
+            'Content-Type': 'application/json',
+            'Content-Length': String(Buffer.byteLength(bodyStr)),
+          }
+        : {}),
+      ...customHeaders,
+    };
+    if (isPipe && !headers.Host) {
+      headers.Host = '127.0.0.1';
+    }
 
     const options = isPipe
       ? {
           socketPath: baseUrl,
           path,
           method,
-          headers: {
-            ...(bodyStr !== undefined
-              ? {
-                  'Content-Type': 'application/json',
-                  'Content-Length': String(Buffer.byteLength(bodyStr)),
-                }
-              : {}),
-            Host: '127.0.0.1',
-          },
+          headers,
         }
       : {
           hostname: new URL(baseUrl).hostname,
           port: new URL(baseUrl).port,
           path,
           method,
-          headers: {
-            ...(bodyStr !== undefined
-              ? {
-                  'Content-Type': 'application/json',
-                  'Content-Length': String(Buffer.byteLength(bodyStr)),
-                }
-              : {}),
-          },
+          headers,
         };
 
     const req = http.request(options, (res) => {
@@ -177,7 +175,7 @@ export async function jsonRequest(baseUrl, method, path, body) {
         } catch {
           data = { raw: text };
         }
-        resolve({ status: res.statusCode, data });
+        resolve({ status: res.statusCode, headers: res.headers, data });
       });
     });
 

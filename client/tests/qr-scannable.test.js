@@ -4,15 +4,15 @@ import { generateGoogleThemedQrSvg } from '../qr-generator.js';
 import QRCode from '../vendor/qrcode.js';
 import jsQR from 'jsqr';
 
-test('Google-themed QR SVG contains required Google colors and SVG elements', () => {
-  const url = 'https://search.google.com/local/writereview?placeid=ChIJrbt50xezhzkRh80bAb6PB-E';
+test('QR SVG contains Dula Mobiles logo and required styling elements, without Google G', () => {
+  const url = 'https://dulamobiles.vercel.app';
   const svg = generateGoogleThemedQrSvg(url);
 
   // SVG structure
   assert.ok(svg.includes('<svg'), 'Must produce SVG markup');
   assert.ok(svg.includes('class="google-qr-svg"'), 'Must have google-qr-svg class');
 
-  // Google 4-color palette
+  // Google 4-color palette corner accents
   assert.ok(svg.includes('#4285F4'), 'Must have Google Blue #4285F4');
   assert.ok(svg.includes('#EA4335'), 'Must have Google Red #EA4335');
   assert.ok(svg.includes('#FBBC05'), 'Must have Google Yellow #FBBC05');
@@ -21,13 +21,31 @@ test('Google-themed QR SVG contains required Google colors and SVG elements', ()
   // Black data modules
   assert.ok(svg.includes('fill="#111827"'), 'Must render high-contrast dark QR modules');
 
-  // Center Google G shield
-  assert.ok(svg.includes('<circle'), 'Must render center circular shield for Google logo');
-  assert.ok(svg.includes('M22.56 12.25c0-.78'), 'Must include official Google G icon vector');
+  // Center protective white shield
+  assert.ok(svg.includes('<circle'), 'Must render center circular shield');
+
+  // Google G logo must be removed
+  assert.ok(
+    !svg.includes('M22.56 12.25c0-.78'),
+    'Google G vector logo must be removed from the center of the QR code'
+  );
+
+  // Dula Mobiles logo elements must be present
+  assert.ok(svg.includes('id="dulaLogoClip"'), 'Must define dulaLogoClip clipPath');
+  assert.ok(svg.includes('<image'), 'Must render logo <image> element');
+  assert.ok(
+    svg.includes('dulamobiles.jpeg'),
+    'Must reference official Dula Mobiles logo asset (dulamobiles.jpeg)'
+  );
+  assert.ok(
+    svg.includes('fill="#0a0a0a"') || svg.includes('fill="#000000"'),
+    'Must include circular dark background for the Dula Mobiles logo'
+  );
 });
 
 test('Real dynamic QR is genuinely scannable by jsQR decoder with exact URL match', () => {
   const testUrls = [
+    'https://dulamobiles.vercel.app',
     'http://localhost:5173',
     'https://search.google.com/local/writereview?placeid=ChIJrbt50xezhzkRh80bAb6PB-E',
   ];
@@ -72,4 +90,3 @@ test('Real dynamic QR is genuinely scannable by jsQR decoder with exact URL matc
     assert.equal(decoded.data, url, `Decoded URL must exactly match encoded URL: ${url}`);
   }
 });
-

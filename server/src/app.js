@@ -28,15 +28,38 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (isDev && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+
+      const normalizedOrigin = origin.trim().replace(/\/+$/, '');
+
+      // Local development origins
+      if (isDev && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin)) {
         return callback(null, true);
       }
-      if (config.clientUrl && origin === config.clientUrl) {
+
+      // Check configured / default allowed origins list
+      if (config.allowedOrigins && config.allowedOrigins.includes(normalizedOrigin)) {
         return callback(null, true);
       }
+
+      // Exact clientUrl check
+      if (config.clientUrl && normalizedOrigin === config.clientUrl) {
+        return callback(null, true);
+      }
+
+      // Always allow deployed Vercel production origin
+      if (normalizedOrigin === 'https://dulamobiles.vercel.app') {
+        return callback(null, true);
+      }
+
+      // Allow Vercel preview deployments for dulamobiles
+      if (/^https:\/\/dulamobiles(-[a-z0-9-]+)?\.vercel\.app$/.test(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
       return callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
   })
 );
 

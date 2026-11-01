@@ -2,14 +2,7 @@
  * Smart AI Google Review Builder — Client Application
  */
 import { generateGoogleThemedQrSvg } from './qr-generator.js';
-
-// Determine API Base URL with fallback to backend port 5000 if needed
-const API_BASE = (() => {
-  if (window.location.port === '5173' || window.location.port === '5000' || !window.location.port) {
-    return '';
-  }
-  return 'http://localhost:5000';
-})();
+import { apiFetch } from './api-client.js';
 
 const RATING_SENTIMENTS = {
   1: '1 Star — Poor Experience',
@@ -129,10 +122,8 @@ const elements = {
  */
 async function loadConfig() {
   try {
-    const res = await fetch(`${API_BASE}/api/config`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (data.success && data.data) {
+    const data = await apiFetch('/api/config');
+    if (data && data.success && data.data) {
       state.config = {
         ...state.config,
         ...data.data,
@@ -342,14 +333,13 @@ async function generateReview() {
       comment: elements.commentInput.value.trim(),
     };
 
-    const createRes = await fetch(`${API_BASE}/api/feedback`, {
+    const createData = await apiFetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(feedbackPayload),
     });
 
-    const createData = await createRes.json();
-    if (!createRes.ok || !createData.success) {
+    if (!createData.success || !createData.data?.id) {
       throw new Error(createData.message || 'Failed to submit feedback');
     }
 
@@ -375,14 +365,13 @@ async function requestGeneration({ regenerate = false } = {}) {
   }
 
   try {
-    const genRes = await fetch(`${API_BASE}/api/feedback/${state.feedbackId}/generate-review`, {
+    const genData = await apiFetch(`/api/feedback/${state.feedbackId}/generate-review`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ regenerate }),
     });
 
-    const genData = await genRes.json();
-    if (!genRes.ok || !genData.success) {
+    if (!genData.success || !genData.data?.generatedReview) {
       throw new Error(genData.message || 'Failed to generate review draft');
     }
 
@@ -653,7 +642,10 @@ function hideError() {
 function renderQrCode(url) {
   if (!elements.qrCodeGraphic) return;
   try {
-    const qrSvg = generateGoogleThemedQrSvg(url, { size: 240 });
+    const qrSvg = generateGoogleThemedQrSvg(url, {
+      size: 240,
+      logoUrl: state.config?.businessLogoUrl || '/assets/dulamobiles.jpeg',
+    });
     elements.qrCodeGraphic.innerHTML = qrSvg;
   } catch (err) {
     console.error('Failed to generate Google-themed QR code:', err);

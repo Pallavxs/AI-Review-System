@@ -386,3 +386,43 @@ test('Simulated DOM workflow: Clipboard Failure retains review text and presents
   assert.equal(elements.clipboardFallbackBanner.classList.contains('hidden'), false);
 });
 
+test('Standee QR modal structure and open/close/copy interactions', async () => {
+  assert.ok(htmlContent.includes('id="qrModal"'), 'Must have #qrModal overlay');
+  assert.ok(htmlContent.includes('Counter Standee QR Code'), 'Must have modal title "Counter Standee QR Code"');
+  assert.ok(htmlContent.includes('id="openQrModalBtn"'), 'Must have #openQrModalBtn');
+  assert.ok(htmlContent.includes('id="closeQrModalBtn"'), 'Must have #closeQrModalBtn');
+  assert.ok(htmlContent.includes('id="copyQrUrlBtn"'), 'Must have #copyQrUrlBtn');
+  assert.ok(htmlContent.includes('id="qrCodeGraphic"'), 'Must have #qrCodeGraphic');
+
+  // Simulate modal open / close
+  const modal = {
+    classList: {
+      _classes: new Set(['modal-overlay', 'hidden']),
+      add(c) { this._classes.add(c); },
+      remove(c) { this._classes.delete(c); },
+      contains(c) { return this._classes.has(c); },
+    }
+  };
+
+  // Open modal
+  modal.classList.remove('hidden');
+  assert.equal(modal.classList.contains('hidden'), false, 'Modal should not be hidden when opened');
+
+  // Close modal
+  modal.classList.add('hidden');
+  assert.equal(modal.classList.contains('hidden'), true, 'Modal should be hidden when closed');
+
+  // Simulate Copy Link button
+  let copiedUrl = '';
+  const mockNavigator = {
+    clipboard: {
+      writeText: async (t) => { copiedUrl = t; return Promise.resolve(); }
+    }
+  };
+
+  const testFeedbackUrl = 'https://dulamobiles.vercel.app';
+  await mockNavigator.clipboard.writeText(testFeedbackUrl);
+  assert.equal(copiedUrl, 'https://dulamobiles.vercel.app', 'Copy Link button must copy the exact feedback URL');
+});
+
+

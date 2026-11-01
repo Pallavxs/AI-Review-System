@@ -52,13 +52,29 @@ const providerOrder = [
   ...rawOrder.filter((p) => p !== primaryProvider),
 ];
 
+const configuredOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map((u) => u.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
+const defaultOrigins = [
+  'https://dulamobiles.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5000',
+];
+
+const allowedOrigins = Array.from(new Set([...configuredOrigins, ...defaultOrigins]));
+
 const config = {
   env: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT) || 5000,
   mongoUri: process.env.MONGO_URI,
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  clientUrl: (process.env.CLIENT_URL || 'http://localhost:5173').trim().replace(/\/+$/, ''),
+  allowedOrigins,
   publicFeedbackUrl:
-    process.env.PUBLIC_FEEDBACK_URL || process.env.CLIENT_URL || 'http://localhost:5173',
+    (process.env.PUBLIC_FEEDBACK_URL || process.env.CLIENT_URL || 'http://localhost:5173')
+      .trim()
+      .replace(/\/+$/, ''),
   businessName: process.env.BUSINESS_NAME || 'Dula mobiles',
   businessLocation: process.env.BUSINESS_LOCATION || 'Anuppur, Madhya Pradesh',
   businessLogoUrl: process.env.BUSINESS_LOGO_URL || '',
